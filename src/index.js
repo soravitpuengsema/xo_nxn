@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+import { useState } from "react";
 
 function Square(props) {
   return (
@@ -21,37 +22,27 @@ class Board extends React.Component {
     );
   }
 
-  renderReturnRow(n) {
-      return (
-        <p>
-          {n}
-        </p>
-      );
+  renderReturnSquare(n,start) {
+    const squarelist = [];
+    for (var i=0 ; i<n ; i++){
+      squarelist.push(<div>{this.renderSquare(i+start)}</div>)
+      console.log(i+start)
+    }
+    console.log("===")
+    return( 
+      <div>{squarelist}</div>);
   }
 
-  renderReturnSquare(n) {
-    ```<div className="board-row">
-    {this.renderSquare(0)}
-    {this.renderSquare(1)}
-    {this.renderSquare(2)}
-  </div>
-  <div className="board-row">
-    {this.renderSquare(3)}
-    {this.renderSquare(4)}
-    {this.renderSquare(5)}
-  </div>
-  <div className="board-row">
-    {this.renderSquare(6)}
-    {this.renderSquare(7)}
-    {this.renderSquare(8)}
-  </div>```
-    for (var i=0 ; i < n; i++){
-      return (
-        <div>
-        {this.renderSquare(i)}
-        </div>
-      );
+  renderReturnRow(n) {
+    const rowlist = [];
+    var skip = 0;
+    for (var i=0 ; i<n ; i++){
+      skip = n*i
+      rowlist.push(<div className="board-row">{this.renderReturnSquare(n,skip)}</div>)
     }
+    return(
+      <div>{rowlist}</div>
+    );
   }
 
   render() {
@@ -60,9 +51,8 @@ class Board extends React.Component {
         <div>
           Hello
           <div>
-            {this.props.inputn}
+            {this.renderReturnRow(4)}
           </div>
-          {this.renderReturnRow(4)}
         </div>
       </div>
     );
@@ -133,18 +123,17 @@ class Game extends React.Component {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
 
+    const namen = ""
+
+    const handleSubmit = (event) => {
+      event.preventDefault();
+      alert(`The name you entered was: ${namen}`)
+    }
+
     return (
       <div className="game">
         <div className="game-board">
-          <form>
-            <label>number of n:
-              <input 
-                type="text" 
-                value={this.namen}
-              />
-            </label>
-            <input type="submit" />
-          </form>
+          <MyForm/>
           <Board
             squares={current.squares}
             onClick={i => this.handleClick(i)}
@@ -179,4 +168,25 @@ function calculateWinner(squares) {
     }
   }
   return null;
+}
+
+function MyForm() {
+  const [n, setName] = useState("");
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    alert(`n*n ${n}`);
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>n for number:
+        <input 
+          type="number" 
+          value={n}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </label>
+      <input type="submit" />
+    </form>
+  )
 }
