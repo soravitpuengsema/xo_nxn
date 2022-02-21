@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-import { useState } from "react";
-
 function Square(props) {
   return (
     <button className="square" onClick={props.onClick}>
@@ -25,12 +23,12 @@ class Board extends React.Component {
   renderReturnSquare(n,start) {
     const squarelist = [];
     for (var i=0 ; i<n ; i++){
-      squarelist.push(<div>{this.renderSquare(i+start)}</div>)
+      squarelist.push(this.renderSquare(i+start))
       //console.log(i+start)
     }
     //console.log("===")
     return( 
-      <div>{squarelist}</div>);
+      squarelist);
   }
 
   renderReturnRow(n) {
@@ -41,19 +39,14 @@ class Board extends React.Component {
       rowlist.push(<div className="board-row">{this.renderReturnSquare(n,skip)}</div>)
     }
     return(
-      <div>{rowlist}</div>
+      rowlist
     );
   }
 
   render() {
     return (
       <div>
-        <div>
-          Hello
-          <div>
-            {this.renderReturnRow(4)}
-          </div>
-        </div>
+        {this.renderReturnRow(this.props.inputn)}
       </div>
     );
   }
@@ -62,11 +55,12 @@ class Board extends React.Component {
 class Game extends React.Component {
   constructor(props) {
     super(props);
+    this.handleChange = this.handleChange.bind(this);
     this.state = {
-      inputn: 4,
+      inputn: 3,
       history: [
         {
-          squares: Array(this.inputn).fill(null)
+          squares: Array(9).fill(null)
         }
       ],
       stepNumber: 0,
@@ -78,7 +72,7 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
+    if (calculateWinner(squares,this.state.inputn) || squares[i]) {
       return;
     }
     squares[i] = this.state.xIsNext ? "X" : "O";
@@ -93,6 +87,11 @@ class Game extends React.Component {
     });
   }
 
+  changeInput = event => {
+    this.setState({inputn: event.target.value});
+    console.log(this.state.inputn);
+  }
+
   jumpTo(step) {
     this.setState({
       stepNumber: step,
@@ -100,10 +99,17 @@ class Game extends React.Component {
     });
   }
 
+  handleChange(event) {
+      this.setState({inputn: parseInt(event.target.value),
+      history:[{squares: Array(this.state.inputn*this.state.inputn).fill(null)}],
+      stepNumber: 0,
+      xIsNext: true});
+}
+
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares);
+    const winner = calculateWinner(current.squares,this.state.inputn);
 
     const moves = history.map((step, move) => {
       const desc = move ?
@@ -123,23 +129,23 @@ class Game extends React.Component {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
 
-    const namen = ""
-
-    const handleSubmit = (event) => {
-      event.preventDefault();
-      alert(`The name you entered was: ${namen}`)
-    }
-
     return (
       <div className="game">
         <div className="game-board">
-          <MyForm/>
           <Board
             squares={current.squares}
             onClick={i => this.handleClick(i)}
+            inputn={this.state.inputn}
           />
         </div>
         <div className="game-info">
+        <div>
+            <input
+            type="number"
+            value={this.state.inputn}
+            onChange={this.handleChange}
+            />
+        </div>
           <div>{status}</div>
           <ol>{moves}</ol>
         </div>
@@ -150,9 +156,9 @@ class Game extends React.Component {
 
 ReactDOM.render(<Game />, document.getElementById("root"));
 
-function CreateWinnerLines() {
+function CreateWinnerLines(inputn) {
   const winnerlines = [];
-  var inputn = 5;
+  //var inputn = 5;
   var nskip = 0;
   //แนวนอน
   for (let k = 0 ; k < inputn ; k++) {
@@ -192,11 +198,13 @@ function CreateWinnerLines() {
   return (winnerlines);
 }
 
-function calculateWinner(squares) {
+function calculateWinner(squares,inputn) {
   var checkx = 0;
   var checko = 0;
-  var inputn = 5;
-  const lines = CreateWinnerLines();
+  //var inputn = 5;
+  //var checkwinx = true;
+  //var checkwino = true;
+  const lines = CreateWinnerLines(inputn);
   for (let i = 0 ; i < lines.length ; i++) {
     //const [a, b, c, d] = lines[i];
     const linestemp = lines[i];
@@ -205,16 +213,36 @@ function calculateWinner(squares) {
         //console.log("j",j);
         if (squares[linestemp[0]] && squares[linestemp[0]] === "X" && squares[linestemp[0]] === squares[linestemp[j]]){
           checkx += 1;
-        }
-        if (squares[linestemp[0]] && squares[linestemp[0]] === "O" && squares[linestemp[0]] === squares[linestemp[j]]){
-          checko += 1;
+          //pass
+        } else {
+          //checkwinx = false;
+          checkx = 0;
+          break;
         }
       }
-      console.log("Check" , checkx , checko);
-      if (checkx == inputn-1){
+
+      for (let k = 1 ; k < linestemp.length ; k++){
+        //console.log("k",k);
+        if (squares[linestemp[0]] && squares[linestemp[0]] === "O" && squares[linestemp[0]] === squares[linestemp[k]]){
+          checko += 1;
+          //pass
+        } else {
+          //checkwino = false;
+          checko = 0;
+          break;
+        }
+      }
+      //console.log("Check" , checkwinx , checkwino);
+      //if (checkwinx == true) {
+        //return "X";
+      //}
+      //if (checkwino == true) {
+        //return "O";
+      //}
+      if (checkx >= inputn-1){
         return "X";
       }
-      if (checko == inputn-1){
+      if (checko >= inputn-1){
         return "O";
       }
     //if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c] && squares[a] === squares[d]) {
@@ -223,24 +251,3 @@ function calculateWinner(squares) {
   }
   return null;
 }
-
-function MyForm() {
-  const [n, setName] = useState("");
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    alert(`n*n ${n}`);
-  }
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <label>n for number:
-        <input 
-          type="number" 
-          value={n}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </label>
-      <input type="submit" />
-    </form>
-  )
-  }
