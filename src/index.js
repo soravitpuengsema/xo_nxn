@@ -140,12 +140,14 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
         <div>
+          <p>Enter a number for table size n*n</p>
             <input
             type="number"
             value={this.state.inputn}
             onChange={this.handleChange}
             />
         </div>
+          <p></p>
           <div>{status}</div>
           <ol>{moves}</ol>
         </div>
