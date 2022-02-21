@@ -26,9 +26,9 @@ class Board extends React.Component {
     const squarelist = [];
     for (var i=0 ; i<n ; i++){
       squarelist.push(<div>{this.renderSquare(i+start)}</div>)
-      console.log(i+start)
+      //console.log(i+start)
     }
-    console.log("===")
+    //console.log("===")
     return( 
       <div>{squarelist}</div>);
   }
@@ -150,22 +150,76 @@ class Game extends React.Component {
 
 ReactDOM.render(<Game />, document.getElementById("root"));
 
-function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+function CreateWinnerLines() {
+  const winnerlines = [];
+  var inputn = 5;
+  var nskip = 0;
+  //แนวนอน
+  for (let k = 0 ; k < inputn ; k++) {
+    nskip = k*inputn
+    //console.log(nskip);
+    const hlines = []
+    for (let j = 0 ; j < inputn ; j++) {
+      hlines.push(j+nskip);
     }
+    winnerlines.push(hlines);
+  }
+
+  //แนวตั้ง
+  for (let a = 0 ; a < inputn ; a++) {
+    const vlines = [];
+      for (let b = a ; b < (inputn*(inputn-1))+1+a ; b+=inputn) {
+        vlines.push(b);
+      }
+    winnerlines.push(vlines);
+  }
+
+  //แนวเฉียงซ้ายไปขวา
+  const ltor = [];
+  for (let c = 0 ; c < (inputn*inputn) ; c+=inputn+1) {
+    ltor.push(c);
+  }
+  winnerlines.push(ltor);
+
+  //แนวเฉียงขวาไปซ้าย
+  const rtol = [];
+  for (let d = inputn-1 ; d < (inputn*(inputn-1))+1 ; d+=inputn-1) {
+    rtol.push(d);
+  }
+  winnerlines.push(rtol);
+
+  console.log(winnerlines);
+  return (winnerlines);
+}
+
+function calculateWinner(squares) {
+  var checkx = 0;
+  var checko = 0;
+  var inputn = 5;
+  const lines = CreateWinnerLines();
+  for (let i = 0 ; i < lines.length ; i++) {
+    //const [a, b, c, d] = lines[i];
+    const linestemp = lines[i];
+    console.log(linestemp, "now");
+      for (let j = 1 ; j < linestemp.length ; j++){
+        //console.log("j",j);
+        if (squares[linestemp[0]] && squares[linestemp[0]] === "X" && squares[linestemp[0]] === squares[linestemp[j]]){
+          checkx += 1;
+        }
+        if (squares[linestemp[0]] && squares[linestemp[0]] === "O" && squares[linestemp[0]] === squares[linestemp[j]]){
+          checko += 1;
+        }
+      }
+      console.log("Check" , checkx , checko);
+      if (checkx == inputn-1){
+        return "X";
+      }
+      if (checko == inputn-1){
+        return "O";
+      }
+    //if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c] && squares[a] === squares[d]) {
+      //return squares[a];
+    //}
   }
   return null;
 }
@@ -189,4 +243,4 @@ function MyForm() {
       <input type="submit" />
     </form>
   )
-}
+  }
