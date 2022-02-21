@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+
 function Square(props) {
   return (
     <button className="square" onClick={props.onClick}>
@@ -20,23 +21,48 @@ class Board extends React.Component {
     );
   }
 
+  renderReturnRow(n) {
+      return (
+        <p>
+          {n}
+        </p>
+      );
+  }
+
+  renderReturnSquare(n) {
+    ```<div className="board-row">
+    {this.renderSquare(0)}
+    {this.renderSquare(1)}
+    {this.renderSquare(2)}
+  </div>
+  <div className="board-row">
+    {this.renderSquare(3)}
+    {this.renderSquare(4)}
+    {this.renderSquare(5)}
+  </div>
+  <div className="board-row">
+    {this.renderSquare(6)}
+    {this.renderSquare(7)}
+    {this.renderSquare(8)}
+  </div>```
+    for (var i=0 ; i < n; i++){
+      return (
+        <div>
+        {this.renderSquare(i)}
+        </div>
+      );
+    }
+  }
+
   render() {
     return (
       <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
+        <div>
+          Hello
+          <div>
+            {this.props.inputn}
+          </div>
+          {this.renderReturnRow(4)}
         </div>
       </div>
     );
@@ -47,9 +73,10 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      inputn: 4,
       history: [
         {
-          squares: Array(9).fill(null)
+          squares: Array(this.inputn).fill(null)
         }
       ],
       stepNumber: 0,
@@ -109,6 +136,15 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="game-board">
+          <form>
+            <label>number of n:
+              <input 
+                type="text" 
+                value={this.namen}
+              />
+            </label>
+            <input type="submit" />
+          </form>
           <Board
             squares={current.squares}
             onClick={i => this.handleClick(i)}
